@@ -36,12 +36,12 @@ public class Drawer : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
     {
         Debug.Log(eventData.position);
         isDrawing = true;
-
+        OnDrag(eventData);
     }
     public void OnDrag(PointerEventData eventData)
     {
         Vector2 position = eventData.position;
-
+        squaredRadius = brushRadius / 2 * brushRadius / 2;
         int offsetX = Screen.width- (int)gameObject.GetComponent<RectTransform>().rect.width;
         int offsetY = Screen.height-(int)gameObject.GetComponent<RectTransform>().rect.height;
 
@@ -54,19 +54,19 @@ public class Drawer : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         int xOnTexture = (int)Mathf.Ceil(((position.x- offsetX) * xRation) - brushRadius / 2);
         int yOnTexture = (int)Mathf.Ceil((position.y * yRation) - brushRadius / 2);
 
+        GenerateHeatMap generateHeatMap = generatedMap.GetComponent<GenerateHeatMap>();
 
-        float xMapTextureRatio = 1024.0f / background.width;
-        float yMapTextureRatio = 1024.0f/1.77777778f / background.height;
+        //float xMapTextureRatio = generateHeatMap.width / background.width;
+        //float yMapTextureRatio = generateHeatMap.width / 1.77777778f / background.height;
 
-        int xOnMap = (int)(xOnTexture * xMapTextureRatio);
-        int yOnMap = (int)(yOnTexture * yMapTextureRatio);
+        //int xOnMap = (int)(xOnTexture * xMapTextureRatio);
+        //int yOnMap = (int)(yOnTexture * yMapTextureRatio);
 
         var pixels = background.GetPixels(xOnTexture, yOnTexture, brushRadius, brushRadius, 0);
         try
         {
-            GenerateHeatMap generateHeatMap = generatedMap.GetComponent<GenerateHeatMap>();
            // Debug.Log(xOnMap.ToString()+"  "+ yOnMap.ToString());
-            onDrawEvent.Invoke(new OnDrawMessage(xOnMap, yOnMap, brushRadius, generateHeatMap.mines,generateHeatMap.normilized));
+            onDrawEvent.Invoke(new OnDrawMessage((int)position.x,(int) position.y, (int)(brushRadius), generateHeatMap.mines,generateHeatMap.normilized));
         }
         catch(System.Exception e)
         {

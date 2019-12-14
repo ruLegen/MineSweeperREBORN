@@ -17,8 +17,8 @@ public class GenerateHeatMap : MonoBehaviour
 
     //normalized array of map;
     public float[,] normilized;
-    public int width  = 1024;
-    public int height;
+    public int width = 2160;
+    public int height = 1080;
 
     Gradient gradient;
     GradientColorKey[] colorKey;
@@ -30,7 +30,9 @@ public class GenerateHeatMap : MonoBehaviour
         img = gameObject.GetComponent<Image>();
         int min;
         int max;
-        height = (int)(width / 1.7777777778); // 1.7 = 16/9
+        width = Screen.width;
+        height = Screen.height; ;
+        //height = (int)(width / 1.7777777778); // 1.7 = 16/9
         gradient = new Gradient();
         colorKey = new GradientColorKey[5];
         colorKey[0].color = Color.red;
