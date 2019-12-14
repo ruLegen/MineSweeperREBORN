@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class GenerateHeatMap : MonoBehaviour
+public class GenerateWaveMap : MonoBehaviour
 {
     // Start is called before the first frame update
 
@@ -22,7 +22,6 @@ public class GenerateHeatMap : MonoBehaviour
     GradientAlphaKey[] alphaKey;
     void Start()
     {
-
         img = gameObject.GetComponent<Image>();
         int min;
         int max;
@@ -58,17 +57,12 @@ public class GenerateHeatMap : MonoBehaviour
         gradient.SetKeys(colorKey, alphaKey);
 
         Texture2D txt = new Texture2D(width, height);
-        var matrix = Utilites.getMatrix(width, height, mineCount, minPower, maxPower, out min, out max);
+        var matrix = Utilites.getWaveMatrix(width, height, mineCount, maxPower, minPower,out min, out max);
         var normilized = Utilites.normolizeMatrix(matrix, width, height, max, min);
-        Debug.Log(normilized);
-
         for (int x = 0; x < txt.width; x++)
         {
             for (int y = 0; y < txt.height; y++)
             {
-
-                // Color clr = Color.Lerp(Color.blue, Color.red, normilized[x, y]);
-
                 txt.SetPixel(x, y, gradient.Evaluate(normilized[x, y]));
             }
         }
@@ -81,5 +75,8 @@ public class GenerateHeatMap : MonoBehaviour
 
     }
 
+
+
+  
 }
    
