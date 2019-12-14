@@ -2,20 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
+public class DrawEvent : UnityEvent<OnDrawMessage> { }
 
 public class Drawer : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IDragHandler
 {
     // Start is called before the first frame update
+    public static DrawEvent onDrawEvent = new DrawEvent();
+
     public Texture2D backgroundOriginal;
     Texture2D background;
     public int brushRadius = 5;
+    int squaredRadius;
     bool isDrawing = false;
-
+    public GameObject generatedMap;
     Image img;
     void Start()
     {
+        squaredRadius = brushRadius/2 * brushRadius/2;
         img = gameObject.GetComponent<Image>();
         Debug.Log("Drag me!");
         background = CopyTexture(backgroundOriginal);
@@ -35,18 +41,50 @@ public class Drawer : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
     public void OnDrag(PointerEventData eventData)
     {
         Vector2 position = eventData.position;
-        float xRation = background.width * 1.0f / Screen.width;
-        float yRation = background.height * 1.0f / Screen.height;
-        //Debug.Log(Mathf.Ceil(position.x * xRation));
-        //Debug.Log(Mathf.Ceil(position.y * yRation));
-        int xOnTexture = (int)Mathf.Ceil((position.x  * xRation) - brushRadius / 2);
-        int yOnTexture = (int)Mathf.Ceil((position.y  * yRation) - brushRadius / 2);
+
+        int offsetX = Screen.width- (int)gameObject.GetComponent<RectTransform>().rect.width;
+        int offsetY = Screen.height-(int)gameObject.GetComponent<RectTransform>().rect.height;
+
+
+      
+        float xRation = background.width * 1.0f / (Screen.width - offsetX);
+        float yRation = background.height * 1.0f / (Screen.height - offsetY);
+
+
+        int xOnTexture = (int)Mathf.Ceil(((position.x- offsetX) * xRation) - brushRadius / 2);
+        int yOnTexture = (int)Mathf.Ceil((position.y * yRation) - brushRadius / 2);
+
+
+        float xMapTextureRatio = 1024.0f / background.width;
+        float yMapTextureRatio = 1024.0f/1.77777778f / background.height;
+
+        int xOnMap = (int)(xOnTexture * xMapTextureRatio);
+        int yOnMap = (int)(yOnTexture * yMapTextureRatio);
 
         var pixels = background.GetPixels(xOnTexture, yOnTexture, brushRadius, brushRadius, 0);
-
-        for(int x = 0; x<  pixels.Length;x++)
+        try
         {
-            pixels[x] =new Color(pixels[x].r, pixels[x].g, pixels[x].b, 0);
+            GenerateHeatMap generateHeatMap = generatedMap.GetComponent<GenerateHeatMap>();
+           // Debug.Log(xOnMap.ToString()+"  "+ yOnMap.ToString());
+            onDrawEvent.Invoke(new OnDrawMessage(xOnMap, yOnMap, brushRadius, generateHeatMap.mines,generateHeatMap.normilized));
+        }
+        catch(System.Exception e)
+        {
+            Debug.Log(e.Message);
+        }
+
+        for (int x = 0; x <brushRadius; x++)
+        {
+            for (int y = 0; y < brushRadius; y++)
+            {
+                //пому что он одномерный
+                int index = (x * brushRadius) + y;
+                int u = x - brushRadius / 2;
+                int v = y - brushRadius / 2;
+                if (u*u + v*v < squaredRadius)
+                    pixels[index] = new Color(pixels[index].r, pixels[index].g, pixels[index].b, 0);
+            }
+
         }
         background.SetPixels(xOnTexture, yOnTexture, brushRadius, brushRadius, pixels);
         background.Apply();

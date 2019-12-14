@@ -27,17 +27,10 @@ public class Utilites : MonoBehaviour
     }
 
 
-    public static int[,] getWaveMatrix(int width, int height, int count, int maxforсe, int minforce, out int min, out int max)
+    public static int[,] getWaveMatrix(int width, int height, Mine[] mines, out int min, out int max)
     {
-        int[] x_coords = new int[count];
-        int[] y_coords = new int[count];
-        int[] force = new int[count];
-        for (int i = 0; i < count; i++)
-        {
-            x_coords[i] = Random.Range(0, width);
-            y_coords[i] = Random.Range(0, height);
-            force[i] = Random.Range(minforce, maxforсe);
-        }
+       
+       
         int[,] matrix = new int[width, height];
 
         min = int.MaxValue;
@@ -47,17 +40,20 @@ public class Utilites : MonoBehaviour
             for (int y = 0; y < height; y++)
             {
                 int val = 0;
-                for (int n = 0; n < count; n++)
+                for (int n = 0; n < mines.Length; n++)
                 {
-                    val += distWaveFunc(width - x - x_coords[n], height - y - y_coords[n], force[n]);
-                    val += distWaveFunc(width + x - x_coords[n], height - y - y_coords[n], force[n]);
-                    val += distWaveFunc(width * 3 - x - x_coords[n], height - y - y_coords[n], force[n]);
-                    val += distWaveFunc(width - x - x_coords[n], height + y - y_coords[n], force[n]);
-                    val += distWaveFunc(width + x - x_coords[n], height + y - y_coords[n], force[n]);
-                    val += distWaveFunc(width * 3 - x - x_coords[n], height + y - y_coords[n], force[n]);
-                    val += distWaveFunc(width - x - x_coords[n], height * 3 - y - y_coords[n], force[n]);
-                    val += distWaveFunc(width + x - x_coords[n], height * 3 - y - y_coords[n], force[n]);
-                    val += distWaveFunc(width * 3 - x - x_coords[n], height * 3 - y - y_coords[n], force[n]);
+                    int mineX = (int)mines[n].position.x;
+                    int mineY = (int)mines[n].position.y;
+                    int force = (int)mines[n].force;
+                    val += distWaveFunc(width - x - mineX, height - y - mineY, force);
+                    val += distWaveFunc(width + x - mineX, height - y - mineY, force);
+                    val += distWaveFunc(width * 3 - x - mineX, height - y - mineY, force);
+                    val += distWaveFunc(width - x - mineX, height + y - mineY, force);
+                    val += distWaveFunc(width + x - mineX, height + y - mineY, force);
+                    val += distWaveFunc(width * 3 - x - mineX, height + y - mineY, force);
+                    val += distWaveFunc(width - x - mineX, height * 3 - y - mineY, force);
+                    val += distWaveFunc(width + x - mineX, height * 3 - y - mineY, force);
+                    val += distWaveFunc(width * 3 - x - mineX, height * 3 - y - mineY, force);
                 }
                 matrix[x, y] = val;
                 if (val < min) min = val;
@@ -66,19 +62,21 @@ public class Utilites : MonoBehaviour
         }
         return matrix;
     }
-    public static int[,] getMatrix(int width, int height, int count, int maxforсe, int minforce, out int min, out int max)
+
+    public static Mine[] generateMines(int width, int height, int count, int maxforсe, int minforce)
+    {
+        Mine[] mines = new Mine[count];
+        for(int i = 0; i< mines.Length; i++)
+        {
+            mines[i] = new Mine(new Vector2(Random.Range(0, width), Random.Range(0, height)), Random.Range(minforce, maxforсe));
+        }
+        return mines;
+    }
+
+    public static int[,] getMatrix(int width, int height, Mine[] mines, out int min, out int max)
     {
         int[,] matrix = new int[width, height];
-        int[] x_coords = new int[count];
-        int[] y_coords = new int[count];
-        int[] force = new int[count];
-        for (int i = 0; i < count; i++)
-        {
-            x_coords[i] = Random.Range(0 , width);
-            y_coords[i] = Random.Range(0, height);
-            force[i] = Random.Range(minforce, maxforсe);
-        }
-
+      
         min = int.MaxValue;
         max = 0;
 
@@ -87,10 +85,10 @@ public class Utilites : MonoBehaviour
             for (int y = 0; y < height; y++)
             {
                 matrix[x, y] = 0;
-                for (int n = 0; n < count; n++)
+                for (int n = 0; n < mines.Length; n++)
                 {
 
-                    matrix[x, y] += distFunc(x - x_coords[n], y - y_coords[n], force[n]);
+                    matrix[x, y] += distFunc(x - (int)mines[n].position.x, y - (int)mines[n].position.y, (int)mines[n].force);
                 }
                 int value = matrix[x, y];
                 if (min > value) min = value;
@@ -120,3 +118,5 @@ public class Utilites : MonoBehaviour
    
 
 }
+
+

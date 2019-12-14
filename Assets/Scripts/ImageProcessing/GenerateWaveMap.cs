@@ -14,19 +14,20 @@ public class GenerateWaveMap : MonoBehaviour
     public int maxPower = 1000000;
     public int minPower = 1000000;
     public int mineCount = 6;
-    int width;
-    int height;
+    public int width = 1024;
+    public int height;
 
     Gradient gradient;
     GradientColorKey[] colorKey;
     GradientAlphaKey[] alphaKey;
+
+    Mine[] mines;
     void Start()
     {
         img = gameObject.GetComponent<Image>();
         int min;
         int max;
-        width = 1024;
-        height = (int)(width / 1.7); // 1.7 = 16/9
+        height = (int)(width / 1.7777777778); // 1.7 = 16/9
         gradient = new Gradient();
         colorKey = new GradientColorKey[5];
         colorKey[0].color = Color.red;
@@ -57,7 +58,9 @@ public class GenerateWaveMap : MonoBehaviour
         gradient.SetKeys(colorKey, alphaKey);
 
         Texture2D txt = new Texture2D(width, height);
-        var matrix = Utilites.getWaveMatrix(width, height, mineCount, maxPower, minPower,out min, out max);
+        mines = Utilites.generateMines(width, height, mineCount, minPower, maxPower);
+
+        var matrix = Utilites.getWaveMatrix(width, height, mines,out min, out max);
         var normilized = Utilites.normolizeMatrix(matrix, width, height, max, min);
         for (int x = 0; x < txt.width; x++)
         {
