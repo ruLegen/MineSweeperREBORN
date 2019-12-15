@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+
 public class GenerateHeatMap : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -24,7 +25,9 @@ public class GenerateHeatMap : MonoBehaviour
     GradientColorKey[] colorKey;
     GradientAlphaKey[] alphaKey;
     public Mine[] mines;
-    void Start()
+    public bool isDone = false;
+
+    public  void Generate()
     {
 
         img = gameObject.GetComponent<Image>();
@@ -78,8 +81,7 @@ public class GenerateHeatMap : MonoBehaviour
         Sprite spr = Sprite.Create(txt, new Rect(0, 0, txt.width, txt.height), new Vector2(0, 0));
         img.sprite = spr;
 
-
-
+        isDone = true;
     }
 
 }

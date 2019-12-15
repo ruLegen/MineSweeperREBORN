@@ -10,6 +10,7 @@ public class OnDrawMessage
     public Mine[] mines;
     public float[,] normilized;
 
+
     public OnDrawMessage(int _x, int _y, int _brushSize, Mine[] _mines, float[,] _normlized)
     {
         x = _x;

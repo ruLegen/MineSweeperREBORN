@@ -90,7 +90,42 @@ public class Drawer : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, 
         background.Apply();
     }
 
+    public void DrawOn(float x, float y)
+    {
+        Vector2 position = new Vector2(x, y);
+        squaredRadius = brushRadius/2* brushRadius/2;
+        int offsetX = Screen.width - (int)gameObject.GetComponent<RectTransform>().rect.width;
+        int offsetY = Screen.height - (int)gameObject.GetComponent<RectTransform>().rect.height;
 
+
+
+        float xRation = background.width * 1.0f / (Screen.width - offsetX);
+        float yRation = background.height * 1.0f / (Screen.height - offsetY);
+
+
+        int xOnTexture = (int)Mathf.Ceil(((position.x - offsetX) * xRation) - brushRadius/2);
+        int yOnTexture = (int)Mathf.Ceil((position.y * yRation) - brushRadius/2);
+
+        GenerateHeatMap generateHeatMap = generatedMap.GetComponent<GenerateHeatMap>();
+
+        var pixels = background.GetPixels(xOnTexture, yOnTexture, brushRadius, brushRadius, 0);
+        for (int x1 = 0; x1 < brushRadius; x1++)
+        {
+            for (int y1 = 0; y1 < brushRadius; y1++)
+            {
+                //пому что он одномерный
+                int index = (x1 * brushRadius) + y1;
+                int u = x1 - brushRadius/2;
+                int v = y1 - brushRadius/2;
+                if (u * u + v * v < squaredRadius + Random.Range(100, 330))
+                    pixels[index] = new Color(pixels[index].r, pixels[index].g, pixels[index].b, 0);
+            }
+
+        }
+        background.SetPixels(xOnTexture, yOnTexture, brushRadius, brushRadius, pixels);
+        background.Apply();
+
+    }
     public Texture2D CopyTexture(Texture2D src)
     {
         Texture2D newTexture = new Texture2D(src.width, src.height);
