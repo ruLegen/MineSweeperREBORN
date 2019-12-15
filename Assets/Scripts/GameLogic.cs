@@ -7,12 +7,14 @@ using UnityEngine.Events;
 public class GameLogic : MonoBehaviour
 {
     int score = 0;
-    bool isEndGame = false;
+    public static bool isEndGame = false;
     public GameObject endGame;
     public GameObject winGame;
     public GameObject canvas;
     public Text percentFilled;
     public GameObject DrawObject;
+    public GameObject GameSoundeObject;
+
     int filled = 0;
     int totalLength = 0;
     public Text scoreText;
@@ -118,6 +120,7 @@ public class GameLogic : MonoBehaviour
                                 if (percent >= percentWin)
                                 {
                                     winGame.SetActive(true);
+                                    GameSoundeObject.GetComponent<AudioSource>().Stop();
                                     return;
                                 }
                                 score += (int)(visitedMap[x, y] * 5);
